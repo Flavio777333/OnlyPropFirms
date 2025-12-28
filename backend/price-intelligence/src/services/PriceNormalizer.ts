@@ -30,6 +30,7 @@ export class PriceNormalizer implements IPriceNormalizer {
             if (accountSize > 0 && currentPrice > 0) {
                 results.push({
                     propFirmId: catalogEntry.propFirmId,
+                    propFirmName: catalogEntry.propFirmName,
                     accountSize: accountSize,
                     accountSizeCurrency: 'USD', // Default assumption
                     currentPrice: currentPrice,
