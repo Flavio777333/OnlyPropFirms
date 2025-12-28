@@ -29,80 +29,62 @@
 
 ---
 
-## 🚀 Phase 1: Price Intelligence & Crawler (IN PROGRESS 🚧)
+## 🚀 Phase 1: Price Intelligence & Crawler (COMPLETED ✅)
 **Goal:** Real-time pricing data and "New Deals" feature.
 
-### ✅ Phase 1.0: Structure & Mock Integration (COMPLETE)
-- [x] Backend Structure (Models, DTOs, Services, Controllers, Interfaces)
-- [x] Source Catalog & Models (Pricing, ChangeDetection, SourceCatalogEntry)
-- [x] API Contract (OpenAPI Specification for 3 pricing endpoints)
-- [x] Frontend Types & Service Layer (pricing.ts, pricingService.ts)
-- [x] NewDealsSection Component (homepage integration)
-- [x] Enhanced FirmCard with Pricing & Deal Badges
-- [x] Mock Data Integration (2 sample firms with pricing)
-- [x] Documentation (OVERVIEW.md, API_CONTRACT.md, CRAWLER_STRATEGY.md, ADR-007)
-- [x] Critical Bug Fixes (Import paths, API URL port 8081, homepage integration)
-
-**Validation Reports**:
-- [PHASE_1_STRUCTURE_VALIDATION.md](../PHASE_1_STRUCTURE_VALIDATION.md) - Full structure analysis
-- [PHASE_1_CORRECTIONS_APPLIED.md](../PHASE_1_CORRECTIONS_APPLIED.md) - Bug fixes applied
+### ✅ Phase 1.0 - 1.3: Implementation (COMPLETE)
+- [x] Backend Structure & API Mock
+- [x] Database Schema & Repositories (`pricing_snapshots`, `source_catalog`)
+- [x] Web Crawler (Puppeteer + Stealth)
+- [x] Frontend "New Deals" Section
+- [x] Scheduler & Change Detection
 
 ---
 
-### 🚧 Phase 1.1: Implementation (PENDING)
-
-**Database & Persistence**:
-- [x] Create `pricing_snapshots` table migration
-- [x] Create `source_catalog` table migration
-- [x] Implement `PricingRepository` (implements `IPricingStore`)
-- [ ] Implement PropFirmName join logic (resolve 'TODO' in PricingService.ts:89)
-
-**Web Crawler & Data Collection**:
-- [ ] Implement `PriceNormalizer` (Cheerio for HTML parsing)
-- [ ] Implement `ChangeDetectionService` (time-series query logic)
-- [ ] Implement `SourceCatalogService` (load from database)
-- [ ] Add error handling & retry logic for crawlers
-- [ ] Add proxy rotation strategy (if needed)
-
-**Automation & Scheduling**:
-- [ ] Implement scheduler/cron jobs for periodic crawling
-- [ ] Add rate limiting per firm (respect robots.txt)
-- [ ] Add monitoring & alerting for crawler failures
-
-**Frontend Integration**:
-- [ ] Replace mock data with real API calls in `pricingService.ts`
-- [ ] Add error handling & retry logic for API calls
-- [ ] Add loading states & skeleton screens
-
-**Testing**:
-- [ ] Backend unit tests (PricingService, ChangeDetectionService, etc.)
-- [ ] Backend integration tests (API endpoints with database)
-- [ ] Frontend unit tests (NewDealsSection, enhanced FirmCard)
-- [ ] E2E tests for "New Deals" user journey
-
-**Additional Features**:
-- [ ] True Cost Calculator (Phase 1 or deferred to Phase 2)
+## 🚀 Phase 2: True Cost Calculator (COMPLETED ✅)
+**Goal:** Implement algorithm to calculate "True Cost" of accounts.
+- [x] `TrueCostService` Implementation
+- [x] Fee Handling (Activation, Monthly, etc.)
+- [x] Integration with Pricing Models
 
 ---
 
-### ⛔ Deferred to Phase 2+
-- User Accounts / Auth0
-- Kubernetes / EKS
-- Multi-region Deployment
-- Distributed Tracing
+## 🚀 Phase 3: Comparison Matrix (COMPLETED ✅)
+**Goal:** Comparison table for side-by-side analysis.
+- [x] Backend Comparison Endpoint
+- [x] Frontend Comparison Matrix Component
+- [x] Firm Selection Logic
 
 ---
 
-## 🚀 Phase 2: Production Readiness (Q2 2026)
-**Goal:** AWS deployment and additional features.
-- [ ] AWS Deployment (EC2/RDS or ECS/Fargate)
-- [ ] Economic Calendar Integration
-- [ ] Affiliate Analytics Dashboard
-- [ ] User Accounts & Authentication (Auth0)
+## 🚀 Phase 4: Data Population (COMPLETED ✅)
+**Goal:** Populate with real firm data.
+- [x] Real Selectors for Apex, FTMO, TopStep
+- [x] Stealth Mode Configuration
+- [x] Data Seeding
 
 ---
 
-## 🌍 Phase 3: Enterprise Scale (Q3+ 2026)
+## 🚀 Phase 5: System Integration & Polish (COMPLETED ✅)
+**Goal:** Deep Dive Analysis fixes.
+- [x] DB Refactoring (Singleton Pool)
+- [x] Java Swagger/OpenAPI
+- [x] Java Global Exception Handling & CORS
+- [x] Unified Frontend API Client
+
+---
+
+## 🚀 Phase 6: Production Readiness (CURRENT 🚧)
+**Goal:** Prepare for production deployment.
+- [ ] **Infrastructure**: `docker-compose.prod.yml`
+- [ ] **Reverse Proxy**: Nginx Configuration
+- [ ] **CI/CD**: GitHub Actions for Build/Test
+- [ ] **Monitoring**: Basic Container Monitoring
+- [ ] **Security**: Rate Limiting & Hardening
+
+---
+
+## 🌍 Phase 7: Enterprise Scale (Q3+ 2026)
 **Goal:** Enterprise architecture for global scale.
 - [ ] Kubernetes (EKS)
 - [ ] Multi-region Failover

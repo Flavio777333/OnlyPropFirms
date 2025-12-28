@@ -1,21 +1,31 @@
-import axios from 'axios';
+import { javaApi } from '@/lib/apiClient';
 import { PropFirm } from '@/store/features/propFirms/propFirmSlice';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/api/v1';
-
+/**
+ * Prop Firm Service
+ * Handles all communication with the Java backend for prop firm catalog data
+ */
 export const propFirmService = {
+    /**
+     * Get all prop firms
+     */
     getAll: async (): Promise<PropFirm[]> => {
-        const response = await axios.get<PropFirm[]>(`${API_URL}/prop-firms`);
-        return response.data;
+        return javaApi.get<PropFirm[]>('/prop-firms');
     },
 
+    /**
+     * Get a specific prop firm by ID
+     */
     getById: async (id: string): Promise<PropFirm> => {
-        const response = await axios.get<PropFirm>(`${API_URL}/prop-firms/${id}`);
-        return response.data;
+        return javaApi.get<PropFirm>(`/prop-firms/${id}`);
     },
 
+    /**
+     * Filter prop firms by criteria
+     * TODO: Implement on backend
+     */
     filter: async (criteria: { minFunding?: number; platform?: string }): Promise<PropFirm[]> => {
-        const response = await axios.post<{ data: PropFirm[] }>(`${API_URL}/filter-firms`, criteria);
-        return response.data.data;
+        return javaApi.post<{ data: PropFirm[] }>('/filter-firms', criteria)
+            .then(response => response.data);
     }
 };

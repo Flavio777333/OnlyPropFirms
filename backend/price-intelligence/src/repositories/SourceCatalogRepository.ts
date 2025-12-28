@@ -1,15 +1,11 @@
-import { Pool } from 'pg';
+import pool from '../database/connection';
 import { SourceCatalogEntry } from '../models/SourceCatalogEntry';
 
 export class SourceCatalogRepository {
-    private pool: Pool;
-
-    constructor(connectionString: string) {
-        this.pool = new Pool({ connectionString });
-    }
+    // Pool is imported
 
     async getAllActive(): Promise<SourceCatalogEntry[]> {
-        const client = await this.pool.connect();
+        const client = await pool.connect();
         try {
             const res = await client.query('SELECT * FROM source_catalog WHERE is_active = TRUE');
             return res.rows.map(this.mapRowToEntry);
@@ -19,7 +15,7 @@ export class SourceCatalogRepository {
     }
 
     async save(entry: SourceCatalogEntry): Promise<void> {
-        const client = await this.pool.connect();
+        const client = await pool.connect();
         try {
             const query = `
         INSERT INTO source_catalog (

@@ -24,8 +24,8 @@ app.use(express.json());
 const dbUrl = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/onlypropfirms';
 
 console.log(`[Init] Connecting to database...`);
-const pricingRepo = new PricingRepository(dbUrl);
-const catalogRepo = new SourceCatalogRepository(dbUrl);
+const pricingRepo = new PricingRepository();
+const catalogRepo = new SourceCatalogRepository();
 
 import { ComparisonService } from './services/ComparisonService';
 import { ComparisonController } from './controllers/ComparisonController';

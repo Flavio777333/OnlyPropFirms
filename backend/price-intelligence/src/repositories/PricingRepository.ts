@@ -1,22 +1,16 @@
-import { Pool, PoolClient } from 'pg';
+import pool from '../database/connection';
 import { IPricingStore } from '../interfaces/IPricingStore';
 import { Pricing, PricingSnapshot } from '../models/Pricing';
 import { PricingDTO } from '../dtos/PricingDTO';
 
 export class PricingRepository implements IPricingStore {
-    private pool: Pool;
-
-    constructor(connectionString: string) {
-        this.pool = new Pool({
-            connectionString,
-        });
-    }
+    // Pool is imported from connection.ts
 
     /**
      * Save a new pricing snapshot
      */
     async savePricingSnapshot(pricing: Pricing): Promise<PricingSnapshot> {
-        const client = await this.pool.connect();
+        const client = await pool.connect();
         try {
             const query = `
         INSERT INTO pricing_snapshots (
@@ -57,7 +51,7 @@ export class PricingRepository implements IPricingStore {
      * Gets the LATEST snapshot for each account size
      */
     async getCurrentPricing(propFirmId: string, accountSize?: number): Promise<Pricing | null> {
-        const client = await this.pool.connect();
+        const client = await pool.connect();
         try {
             let query = `
         SELECT DISTINCT ON (ps.prop_firm_id, ps.account_size) 
@@ -91,7 +85,7 @@ export class PricingRepository implements IPricingStore {
      * Bulk get current pricing
      */
     async getBulkPricing(filters?: { propFirmIds?: string[]; minDiscount?: number }): Promise<Pricing[]> {
-        const client = await this.pool.connect();
+        const client = await pool.connect();
         try {
             // Complex query to get latest per group
             let query = `
@@ -131,7 +125,7 @@ export class PricingRepository implements IPricingStore {
      * Get pricing for specific firms (Comparison Feature)
      */
     async getPricingForFirms(firmIds: string[], accountSize?: number): Promise<Pricing[]> {
-        const client = await this.pool.connect();
+        const client = await pool.connect();
         try {
             let query = `
                 SELECT DISTINCT ON (ps.prop_firm_id, ps.account_size) 

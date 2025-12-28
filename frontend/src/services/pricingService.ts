@@ -1,3 +1,4 @@
+import { pricingApi } from '@/lib/apiClient';
 import { Pricing } from '../types/pricing';
 
 export interface PricingFilters {
@@ -6,44 +7,53 @@ export interface PricingFilters {
     accountSize?: number;
 }
 
+/**
+ * Pricing Service
+ * Handles all communication with the Price Intelligence backend (Node.js)
+ */
 class PricingService {
-    private baseUrl = 'http://localhost:8082/api/v1';
-
+    /**
+     * Get pricing data for all prop firms
+     */
     async getPropFirms(filters?: PricingFilters): Promise<any[]> {
         const params = new URLSearchParams();
         if (filters?.accountSize) params.append('accountSize', filters.accountSize.toString());
-        // Add other filters as needed
+        if (filters?.minPrice) params.append('minPrice', filters.minPrice.toString());
+        if (filters?.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
 
-        const response = await fetch(`${this.baseUrl}/pricing/prop-firms?${params.toString()}`);
-        if (!response.ok) throw new Error('Failed to fetch pricing');
-        return response.json();
+        const query = params.toString() ? `?${params.toString()}` : '';
+        return pricingApi.get<any[]>(`/pricing/prop-firms${query}`);
     }
 
-    async getFirmDetails(id: string): Promise<any> {
-        const response = await fetch(`${this.baseUrl}/pricing/prop-firms/${id}`);
-        if (!response.ok) throw new Error('Failed to fetch firm details');
-        return response.json();
+    /**
+     * Get pricing details for a specific firm
+     */
+    async getFirmDetails(id: string, accountSize?: number): Promise<any> {
+        const params = accountSize ? `?accountSize=${accountSize}` : '';
+        return pricingApi.get<any>(`/pricing/prop-firms/${id}${params}`);
     }
 
+    /**
+     * Get new deals (recent price changes or discounts)
+     */
     async getNewDeals(): Promise<Pricing[]> {
-        const response = await fetch(`${this.baseUrl}/pricing/new-deals`);
-        if (!response.ok) throw new Error('Failed to fetch new deals');
-        const json = await response.json();
-        return json.map((item: any) => ({
+        const deals = await pricingApi.get<any[]>('/pricing/new-deals');
+        return deals.map((item: any) => ({
             ...item,
-            lastUpdatedAt: new Date(item.lastSeenAt)
+            lastUpdatedAt: new Date(item.lastSeenAt),
         }));
     }
 
+    /**
+     * Compare pricing across multiple firms
+     */
     async compareFirms(firmIds: string[], accountSize?: number): Promise<any[]> {
         const params = new URLSearchParams();
         params.append('ids', firmIds.join(','));
         if (accountSize) params.append('accountSize', accountSize.toString());
 
-        const response = await fetch(`${this.baseUrl}/pricing/compare?${params.toString()}`);
-        if (!response.ok) throw new Error('Failed to fetch comparison');
-        const json = await response.json();
-        return json.data; // Assuming backend returns { data: [...] }
+        const response = await pricingApi.get<{ data: any[] }>(`/pricing/compare?${params.toString()}`);
+        return response.data;
     }
 }
 

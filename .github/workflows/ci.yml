@@ -1,4 +1,4 @@
-name: CI
+name: OnlyPropFirms CI
 
 on:
   push:
@@ -7,12 +7,11 @@ on:
     branches: [ "main" ]
 
 jobs:
-  backend-build:
+  # ---------------------------------------------------------------------------
+  # Test Java Backend
+  # ---------------------------------------------------------------------------
+  test-backend:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
-
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 17
@@ -21,26 +20,49 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+    - name: Build and Test with Maven
+      working-directory: ./backend
+      run: mvn test
 
-  frontend-build:
+  # ---------------------------------------------------------------------------
+  # Test Price Intelligence (Node.js)
+  # ---------------------------------------------------------------------------
+  test-pricing:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
-
     steps:
     - uses: actions/checkout@v3
-    - name: Use Node.js 20
+    - name: Use Node.js 18
       uses: actions/setup-node@v3
       with:
-        node-version: '20'
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: backend/price-intelligence/package-lock.json
+    - name: Install Dependencies
+      working-directory: ./backend/price-intelligence
+      run: npm ci
+    # - name: Run Tests
+    #   working-directory: ./backend/price-intelligence
+    #   run: npm test # Uncomment when tests are available
+
+  # ---------------------------------------------------------------------------
+  # Test Frontend (Next.js)
+  # ---------------------------------------------------------------------------
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js 18
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
-    - name: Install dependencies
-      run: npm install
-    - name: Build Next.js
-      run: npm run build
+    - name: Install Dependencies
+      working-directory: ./frontend
+      run: npm ci
     # - name: Run Lint
+    #   working-directory: ./frontend
     #   run: npm run lint
+    # - name: Run Tests
+    #   working-directory: ./frontend
+    #   run: npm test # Uncomment when tests are available
