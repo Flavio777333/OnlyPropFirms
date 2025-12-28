@@ -52,13 +52,12 @@
 ### 🚧 Phase 1.1: Implementation (PENDING)
 
 **Database & Persistence**:
-- [ ] Create `pricing_snapshots` table migration
-- [ ] Create `source_catalog` table migration
-- [ ] Implement `PricingRepository` (implements `IPricingStore`)
+- [x] Create `pricing_snapshots` table migration
+- [x] Create `source_catalog` table migration
+- [x] Implement `PricingRepository` (implements `IPricingStore`)
 - [ ] Implement PropFirmName join logic (resolve 'TODO' in PricingService.ts:89)
 
 **Web Crawler & Data Collection**:
-- [ ] Implement `PriceCrawler` (Puppeteer for dynamic pages)
 - [ ] Implement `PriceNormalizer` (Cheerio for HTML parsing)
 - [ ] Implement `ChangeDetectionService` (time-series query logic)
 - [ ] Implement `SourceCatalogService` (load from database)

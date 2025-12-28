@@ -9,10 +9,12 @@ import { PricingController } from './controllers/PricingController';
 import { PriceCrawler } from './services/PriceCrawler';
 import { PriceNormalizer } from './services/PriceNormalizer';
 
+import { CrawlScheduler } from './services/CrawlScheduler';
+
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 8082;
+const port = process.env.PORT || 8082; // Updated to 8082
 
 // Middleware
 app.use(cors());
@@ -29,6 +31,10 @@ const catalogRepo = new SourceCatalogRepository(dbUrl);
 const changeDetector = new ChangeDetectionService();
 const crawler = new PriceCrawler();
 const normalizer = new PriceNormalizer();
+const scheduler = new CrawlScheduler(catalogRepo, crawler, normalizer, pricingRepo, changeDetector);
+
+// Start Scheduler
+scheduler.start();
 
 // Main Service
 const pricingService = new PricingService(pricingRepo, changeDetector);

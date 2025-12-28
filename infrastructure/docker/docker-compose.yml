@@ -48,6 +48,28 @@ services:
       - opf-network
 
   # -------------------------
+  # BACKEND (Price Intelligence - Node.js)
+  # -------------------------
+  price-intelligence:
+    build:
+      context: ../../backend/price-intelligence
+      dockerfile: Dockerfile
+    container_name: onlypropfirms-price-intelligence
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 8082
+      DATABASE_URL: postgresql://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-admin123}@db:5432/${POSTGRES_DB:-propfirms_mvp}
+      # PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true" # We install chrome manually in Dockerfile
+      # PUPPETEER_EXECUTABLE_PATH: "/usr/bin/google-chrome-stable"
+    ports:
+      - "8082:8082"
+    networks:
+      - opf-network
+
+  # -------------------------
   # FRONTEND (Next.js)
   # -------------------------
   frontend:
