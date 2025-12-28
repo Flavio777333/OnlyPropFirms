@@ -12,7 +12,7 @@ import { PriceNormalizer } from './services/PriceNormalizer';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 8081;
+const port = process.env.PORT || 8082;
 
 // Middleware
 app.use(cors());

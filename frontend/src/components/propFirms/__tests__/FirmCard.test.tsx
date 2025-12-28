@@ -1,35 +1,71 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import FirmCard from '../FirmCard'
-import { PropFirm } from '@/store/features/propFirms/propFirmSlice'
-
-const mockFirm: PropFirm = {
-    id: 'test-firm',
-    name: 'Test Firm',
-    profitSplit: '90/10',
-    minFunding: 25000,
-    maxFunding: 300000,
-    evaluationFee: 150.00,
-    rating: 4.8,
-    reviewCount: 100,
-    isFeatured: true,
-    affiliateLink: 'https://example.com'
-}
+import { FirmCard } from '../FirmCard'
 
 describe('FirmCard', () => {
     it('renders firm name and rating', () => {
-        render(<FirmCard firm={mockFirm} />)
+        render(
+            <FirmCard
+                propFirmId="test-firm"
+                propFirmName="Test Firm"
+                rating={4.8}
+                reviewCount={100}
+            />
+        )
         expect(screen.getByText('Test Firm')).toBeInTheDocument()
         expect(screen.getByText(/4.8/)).toBeInTheDocument()
     })
 
-    it('renders profit split', () => {
-        render(<FirmCard firm={mockFirm} />)
-        expect(screen.getByText('90/10')).toBeInTheDocument()
+    it('renders pricing information when provided', () => {
+        render(
+            <FirmCard
+                propFirmId="test-firm"
+                propFirmName="Test Firm"
+                pricing={{
+                    propFirmId: 'test-firm',
+                    propFirmName: 'Test Firm',
+                    accountSize: 50000,
+                    accountSizeCurrency: 'USD',
+                    currentPrice: 199,
+                    priceCurrency: 'USD',
+                    discountPercent: 30,
+                    discountLabel: 'Special Offer',
+                    lastUpdatedAt: new Date(),
+                    lastUpdatedAtISO: new Date().toISOString(),
+                    lastUpdatedAgo: '2h ago',
+                    isNewDeal: true,
+                    requiresManualReview: false,
+                    sourceUrl: 'https://example.com'
+                }}
+            />
+        )
+        expect(screen.getByText('Test Firm')).toBeInTheDocument()
+        expect(screen.getByText(/50,000/)).toBeInTheDocument()
+        expect(screen.getByText(/199/)).toBeInTheDocument()
     })
 
-    it('renders featured badge when isFeatured is true', () => {
-        render(<FirmCard firm={mockFirm} />)
-        expect(screen.getByText('Featured')).toBeInTheDocument()
+    it('renders deal badges when pricing has discount', () => {
+        render(
+            <FirmCard
+                propFirmId="test-firm"
+                propFirmName="Test Firm"
+                pricing={{
+                    propFirmId: 'test-firm',
+                    propFirmName: 'Test Firm',
+                    accountSize: 50000,
+                    accountSizeCurrency: 'USD',
+                    currentPrice: 199,
+                    priceCurrency: 'USD',
+                    discountPercent: 30,
+                    lastUpdatedAt: new Date(),
+                    lastUpdatedAtISO: new Date().toISOString(),
+                    lastUpdatedAgo: '2h ago',
+                    isNewDeal: true,
+                    requiresManualReview: false,
+                    sourceUrl: 'https://example.com'
+                }}
+            />
+        )
+        expect(screen.getByText('-30% DISCOUNT')).toBeInTheDocument()
     })
 })

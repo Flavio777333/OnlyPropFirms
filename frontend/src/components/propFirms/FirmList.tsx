@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchPropFirms, PropFirm } from '@/store/features/propFirms/propFirmSlice';
-import FirmCard from './FirmCard';
+import { FirmCard } from './FirmCard';
 
 const FirmList: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -38,8 +38,12 @@ const FirmList: React.FC = () => {
             {filteredFirms.map((firm: PropFirm) => (
                 <FirmCard
                     key={firm.id}
-                    firm={firm}
-                    onSelect={(f) => console.log('Selected:', f.name)}
+                    propFirmId={firm.id}
+                    propFirmName={firm.name}
+                    logo={firm.logoUrl}
+                    rating={firm.rating}
+                    reviewCount={firm.reviewCount}
+                    onViewDetails={() => console.log('View details:', firm.name)}
                 />
             ))}
         </div>

@@ -7,7 +7,7 @@ import { Pricing, PricingListResponse } from '../types/pricing';
  * Phase 1: Real API calls to backend
  */
 class PricingService {
-    private baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/api/v1';
+    private baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/api/v1';
 
     /**
    * Fetch pricing list (with optional filters)

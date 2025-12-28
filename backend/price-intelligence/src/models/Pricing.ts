@@ -6,6 +6,8 @@ export interface Pricing {
     // Identity
     id?: string; // UUID, auto-generated on persistence
     propFirmId: string; // Links to prop-firm entity
+    propFirmName: string; // Display name (from Catalog)
+
 
     // Pricing Data
     accountSize: number; // in USD (e.g., 25000, 50000, 100000)

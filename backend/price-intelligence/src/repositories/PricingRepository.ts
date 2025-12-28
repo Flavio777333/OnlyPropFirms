@@ -55,19 +55,22 @@ export class PricingRepository implements IPricingStore {
         const client = await this.pool.connect();
         try {
             let query = `
-        SELECT DISTINCT ON (prop_firm_id, account_size) *
-        FROM pricing_snapshots
-        WHERE prop_firm_id = $1
+        SELECT DISTINCT ON (ps.prop_firm_id, ps.account_size) 
+          ps.*,
+          sc.prop_firm_name
+        FROM pricing_snapshots ps
+        JOIN source_catalog sc ON ps.prop_firm_id = sc.prop_firm_id
+        WHERE ps.prop_firm_id = $1
       `;
 
             const values: any[] = [propFirmId];
 
             if (accountSize) {
-                query += ` AND account_size = $2`;
+                query += ` AND ps.account_size = $2`;
                 values.push(accountSize);
             }
 
-            query += ` ORDER BY prop_firm_id, account_size, snapshot_created_at DESC`;
+            query += ` ORDER BY ps.prop_firm_id, ps.account_size, ps.snapshot_created_at DESC`;
 
             const res = await client.query(query, values);
 
@@ -87,8 +90,11 @@ export class PricingRepository implements IPricingStore {
         try {
             // Complex query to get latest per group
             let query = `
-        SELECT DISTINCT ON (prop_firm_id, account_size) *
-        FROM pricing_snapshots
+        SELECT DISTINCT ON (ps.prop_firm_id, ps.account_size) 
+          ps.*,
+          sc.prop_firm_name
+        FROM pricing_snapshots ps
+        JOIN source_catalog sc ON ps.prop_firm_id = sc.prop_firm_id
         WHERE 1=1
       `;
 
@@ -96,18 +102,18 @@ export class PricingRepository implements IPricingStore {
             let idx = 1;
 
             if (filters?.propFirmIds && filters.propFirmIds.length > 0) {
-                query += ` AND prop_firm_id = ANY($${idx})`;
+                query += ` AND ps.prop_firm_id = ANY($${idx})`;
                 values.push(filters.propFirmIds);
                 idx++;
             }
 
             if (filters?.minDiscount) {
-                query += ` AND discount_percent >= $${idx}`;
+                query += ` AND ps.discount_percent >= $${idx}`;
                 values.push(filters.minDiscount);
                 idx++;
             }
 
-            query += ` ORDER BY prop_firm_id, account_size, snapshot_created_at DESC`;
+            query += ` ORDER BY ps.prop_firm_id, ps.account_size, ps.snapshot_created_at DESC`;
 
             const res = await client.query(query, values);
             return res.rows.map(this.mapRowToPricing);
@@ -123,6 +129,7 @@ export class PricingRepository implements IPricingStore {
     // Mappers
     private mapRowToPricing(row: any): Pricing {
         return {
+            propFirmName: row.prop_firm_name || row.prop_firm_id,
             propFirmId: row.prop_firm_id,
             accountSize: row.account_size,
             accountSizeCurrency: row.account_size_currency,
