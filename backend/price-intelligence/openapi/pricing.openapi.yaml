@@ -1,0 +1,193 @@
+openapi: 3.0.0
+info:
+  title: OnlyPropFirms Pricing API
+  version: 1.0.0-alpha
+  description: |
+    Pricing Intelligence API for OnlyPropFirms.
+    Returns current prices, discounts, and deal information for Prop Firms.
+    
+    **Phase 0 Status:** API contract defined; backend implementation in progress.
+    **Data Source:** Dummy/seed data; real crawlers added in Phase 1.
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development
+  - url: https://api.onlypropfirms.com/api/v1
+    description: Production
+
+paths:
+  /pricing/prop-firms:
+    get:
+      summary: List all current pricing
+      description: Returns a list of all Prop Firms with current pricing data
+      parameters:
+        - name: propFirmIds
+          in: query
+          description: Comma-separated list of prop-firm IDs to filter
+          example: "apex-trader-funding,tradeify"
+          schema:
+            type: string
+        - name: minDiscount
+          in: query
+          description: Filter to firms with at least this discount percentage
+          schema:
+            type: number
+            minimum: 0
+            maximum: 100
+        - name: hasChangedOnly
+          in: query
+          description: If true, only return firms with price changes
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PricingListResponse'
+        '400':
+          description: Bad request (invalid filters)
+        '500':
+          description: Server error
+
+  /pricing/prop-firms/{propFirmId}:
+    get:
+      summary: Get pricing for a specific Prop Firm
+      parameters:
+        - name: propFirmId
+          in: path
+          required: true
+          example: "apex-trader-funding"
+          schema:
+            type: string
+        - name: accountSize
+          in: query
+          description: Optional; filter by specific account size (USD)
+          example: 50000
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PricingDTO'
+        '404':
+          description: Prop Firm not found
+        '500':
+          description: Server error
+
+  /pricing/new-deals:
+    get:
+      summary: Get new deals (price changes in last 24h)
+      description: Returns Prop Firms with pricing changes detected in the last 24 hours
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PricingDTO'
+        '500':
+          description: Server error
+
+components:
+  schemas:
+    PricingDTO:
+      type: object
+      properties:
+        propFirmId:
+          type: string
+          example: "apex-trader-funding"
+        propFirmName:
+          type: string
+          example: "Apex Trader Funding"
+        accountSize:
+          type: number
+          example: 50000
+        accountSizeCurrency:
+          type: string
+          enum: ["USD", "EUR", "GBP"]
+        currentPrice:
+          type: number
+          description: "Evaluation cost for this account size"
+          example: 297
+        priceCurrency:
+          type: string
+          enum: ["USD", "EUR", "GBP"]
+        discountPercent:
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 20
+        discountLabel:
+          type: string
+          example: "Holiday Special"
+          nullable: true
+        trueCost:
+          type: object
+          nullable: true
+          properties:
+            evaluationFee:
+              type: number
+            activationFee:
+              type: number
+            totalFirstMonth:
+              type: number
+        lastUpdatedAt:
+          type: string
+          format: date-time
+        lastUpdatedAgo:
+          type: string
+          example: "2 hours ago"
+        isNewDeal:
+          type: boolean
+          description: "Changed in last 24 hours?"
+        isFeaturedDeal:
+          type: boolean
+          nullable: true
+        requiresManualReview:
+          type: boolean
+        sourceUrl:
+          type: string
+          format: uri
+        affiliateLink:
+          type: string
+          format: uri
+          nullable: true
+
+    PricingListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PricingDTO'
+        meta:
+          type: object
+          properties:
+            total:
+              type: integer
+            page:
+              type: integer
+            pageSize:
+              type: integer
+            hasMore:
+              type: boolean
+        filters:
+          type: object
+          nullable: true

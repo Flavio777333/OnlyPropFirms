@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # -------------------------
+  # POSTGRESQL DATABASE
+  # -------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: onlypropfirms-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin123}
+      POSTGRES_DB: ${POSTGRES_DB:-propfirms_mvp}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - opf-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d propfirms_mvp" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # -------------------------
+  # BACKEND (Spring Boot)
+  # -------------------------
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    container_name: onlypropfirms-backend
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/propfirms_mvp
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-admin}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-admin123}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+    ports:
+      - "8081:8080"
+    networks:
+      - opf-network
+
+  # -------------------------
+  # FRONTEND (Next.js)
+  # -------------------------
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+    container_name: onlypropfirms-frontend
+    restart: on-failure
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8081/api/v1
+      # Note: For server-side calls in Docker network, we might need internal alias
+      API_INTERNAL_URL: http://backend:8080/api/v1
+    ports:
+      - "3000:3000"
+    networks:
+      - opf-network
+
+volumes:
+  postgres_data:
+
+
+networks:
+  opf-network:
+    driver: bridge

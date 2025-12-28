@@ -1,0 +1,69 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Source Catalog Entry",
+    "type": "object",
+    "required": [
+        "propFirmId",
+        "propFirmName",
+        "officialUrl",
+        "pricingPageUrl",
+        "updateStrategy"
+    ],
+    "properties": {
+        "propFirmId": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$",
+            "description": "Unique identifier (slug format)"
+        },
+        "propFirmName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+        },
+        "officialUrl": {
+            "type": "string",
+            "format": "uri"
+        },
+        "pricingPageUrl": {
+            "type": "string",
+            "format": "uri"
+        },
+        "updateStrategy": {
+            "type": "string",
+            "enum": [
+                "api",
+                "html",
+                "manual",
+                "inactive"
+            ]
+        },
+        "updateFrequency": {
+            "type": "string",
+            "enum": [
+                "realtime",
+                "hourly",
+                "4hourly",
+                "daily",
+                "weekly",
+                "manual"
+            ]
+        },
+        "isActive": {
+            "type": "boolean",
+            "default": true
+        },
+        "expectedFields": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "examples": [
+                [
+                    "price",
+                    "discount",
+                    "resetFee"
+                ]
+            ]
+        }
+    }
+}

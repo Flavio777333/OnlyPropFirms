@@ -17,12 +17,24 @@
 6. [Hermetische Projektstruktur](#6-hermetische-projektstruktur)
 7. [Zentrale Roadmap-Datei](#7-zentrale-roadmap-datei)
 8. [Git- & Branch-Strategie](#8-git--branch-strategie)
-9. [Cloud-Readiness](#9-cloud-readiness)
+920. [Cloud-Readiness (Phase 2)](#9-cloud-readiness)
 10. [Architektur-Entscheidungsregister](#10-architektur-entscheidungsregister)
 
 ---
 
-## 1. WEBSEITEN-ANALYSE
+## 0. IMPLEMENTATION RUNWAY (Added via ADR-006)
+
+This architecture document describes the **final desired state**. Implementation follows the **Three-Phase Runway**:
+
+- **Phase 0 (MVP):** Validate core business logic (Local Docker, 3 API endpoints, No K8s).
+- **Phase 1 (Production):** AWS Deployment, True Cost Calculator, Economic Calendar.
+- **Phase 2 (Scale):** Kubernetes, Multi-Region, Distributed Tracing (as described below).
+
+**Refer to ADR-006 for the definitive scope boundary.**
+
+---
+
+## 1. WEBSEITEN-ANALYSE (Phase 0: Core Pages)
 
 ### 1.1 Geschäftszweck & Nutzersegmente
 
@@ -91,7 +103,7 @@ Journey 3: Market Preparation
 
 ---
 
-## 2. FRONTEND-STRUKTUR
+## 2. FRONTEND-STRUKTUR (Phase 0: Core / Phase 1: Features)
 
 ### 2.1 Grobe Architektur-Schichten
 
@@ -520,7 +532,7 @@ API Response Status Code
 
 ---
 
-## 5. BACKEND-HYPOTHESE
+## 5. BACKEND-HYPOTHESE (Phase 0: Skeleton / Phase 1: Full API)
 
 ### 5.1 Wahrscheinliche Backend-Services
 
@@ -703,7 +715,7 @@ Possible Future: User Accounts
 
 ---
 
-## 6. HERMETISCHE PROJEKTSTRUKTUR
+## 6. HERMETISCHE PROJEKTSTRUKTUR (Phase 0: Folder Structure)
 
 ### 6.1 Ordnerstruktur mit Abhängigkeiten
 

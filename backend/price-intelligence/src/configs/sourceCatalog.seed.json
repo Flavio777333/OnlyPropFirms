@@ -1,0 +1,52 @@
+{
+    "catalog": [
+        {
+            "propFirmId": "apex-trader-funding",
+            "propFirmName": "Apex Trader Funding",
+            "officialUrl": "https://www.apextraderfunding.com",
+            "pricingPageUrl": "https://www.apextraderfunding.com/pricing",
+            "affiliateBaseUrl": "https://affiliate.apextraderfunding.com?code=PW",
+            "updateStrategy": "html",
+            "updateFrequency": "daily",
+            "isActive": true,
+            "htmlSelectors": {
+                "containerSelector": ".pricing-package",
+                "accountSizeSelector": ".account-size",
+                "priceSelector": ".price",
+                "discountSelector": ".discount-badge"
+            },
+            "expectedFields": [
+                "price",
+                "discount"
+            ],
+            "priceRangeMin": 50,
+            "priceRangeMax": 1000,
+            "notes": "Uses responsive pricing table; requires careful selector tuning"
+        },
+        {
+            "propFirmId": "tradeify",
+            "propFirmName": "Tradeify",
+            "officialUrl": "https://www.tradeify.com",
+            "pricingPageUrl": "https://www.tradeify.com/pricing",
+            "affiliateBaseUrl": "https://tradeify.com/ref/PW",
+            "updateStrategy": "manual",
+            "updateFrequency": "weekly",
+            "isActive": true,
+            "expectedFields": [
+                "price"
+            ],
+            "notes": "No API available; price changes infrequently"
+        },
+        {
+            "propFirmId": "the-trade-makers",
+            "propFirmName": "TheTradeMakers",
+            "officialUrl": "https://thettrademakers.com",
+            "pricingPageUrl": "https://thetrademakers.com/challenges",
+            "updateStrategy": "inactive",
+            "updateFrequency": "manual",
+            "isActive": false,
+            "expectedFields": [],
+            "notes": "Site restructured; crawler not yet updated"
+        }
+    ]
+}
