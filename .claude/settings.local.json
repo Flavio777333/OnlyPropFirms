@@ -14,7 +14,12 @@
       "Bash(git push:*)",
       "Bash(npm install)",
       "Bash(npm run dev:*)",
-      "Bash(docker build:*)"
+      "Bash(docker build:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(docker logs:*)",
+      "Bash(npm test:*)"
     ]
   }
 }

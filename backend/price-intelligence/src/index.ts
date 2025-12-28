@@ -27,11 +27,15 @@ console.log(`[Init] Connecting to database...`);
 const pricingRepo = new PricingRepository(dbUrl);
 const catalogRepo = new SourceCatalogRepository(dbUrl);
 
+import { ComparisonService } from './services/ComparisonService';
+import { ComparisonController } from './controllers/ComparisonController';
+
 // Services
 const changeDetector = new ChangeDetectionService();
 const crawler = new PriceCrawler();
 const normalizer = new PriceNormalizer();
 const scheduler = new CrawlScheduler(catalogRepo, crawler, normalizer, pricingRepo, changeDetector);
+const comparisonService = new ComparisonService(pricingRepo);
 
 // Start Scheduler
 scheduler.start();
@@ -41,6 +45,7 @@ const pricingService = new PricingService(pricingRepo, changeDetector);
 
 // Controller
 const pricingController = new PricingController(pricingService);
+const comparisonController = new ComparisonController(comparisonService);
 
 // Routes
 const router = express.Router();
@@ -48,6 +53,7 @@ const router = express.Router();
 router.get('/pricing/prop-firms', (req, res) => pricingController.listPricing(req.query).then(data => res.json(data)).catch(err => res.status(500).json({ error: err.message })));
 router.get('/pricing/prop-firms/:id', (req, res) => pricingController.getPricingForFirm(req.params.id, req.query).then(data => res.json(data)).catch(err => res.status(500).json({ error: err.message })));
 router.get('/pricing/new-deals', (req, res) => pricingController.getNewDeals().then(data => res.json(data)).catch(err => res.status(500).json({ error: err.message })));
+router.get('/pricing/compare', comparisonController.compareFirms);
 
 // Temporary Crawl Trigger (for Manual Verification)
 router.post('/admin/crawl/:firmId', async (req, res) => {

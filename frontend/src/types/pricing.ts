@@ -17,6 +17,13 @@ export interface Pricing {
     discountPercent: number;
     discountLabel?: string;
 
+    // Fees & True Cost
+    activationFee?: number;
+    evaluationFee?: number;
+    monthlyDataFee?: number;
+    trueCost?: number;
+
+
     // Recency
     lastUpdatedAt: Date;
     lastUpdatedAtISO: string;

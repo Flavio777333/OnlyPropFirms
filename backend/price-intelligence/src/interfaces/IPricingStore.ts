@@ -24,4 +24,9 @@ export interface IPricingStore {
      * Bulk get current pricing for multiple firms
      */
     getBulkPricing(filters?: { propFirmIds?: string[]; minDiscount?: number }): Promise<Pricing[]>;
+
+    /**
+     * Get pricing for specific firms (Comparison Feature)
+     */
+    getPricingForFirms(firmIds: string[], accountSize?: number): Promise<Pricing[]>;
 }

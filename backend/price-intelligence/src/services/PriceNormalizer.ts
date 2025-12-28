@@ -2,8 +2,10 @@ import * as cheerio from 'cheerio';
 import { IPriceNormalizer } from '../interfaces/IPriceNormalizer';
 import { Pricing } from '../models/Pricing';
 import { SourceCatalogEntry } from '../models/SourceCatalogEntry';
+import { TrueCostService } from './TrueCostService';
 
 export class PriceNormalizer implements IPriceNormalizer {
+    private trueCostService = new TrueCostService();
 
     async normalizeFromHTML(html: string, catalogEntry: SourceCatalogEntry): Promise<Pricing[]> {
         const $ = cheerio.load(html);
@@ -22,27 +24,43 @@ export class PriceNormalizer implements IPriceNormalizer {
             let priceText = selectors.priceSelector ? $el.find(selectors.priceSelector).text() : '';
             let discountText = selectors.discountSelector ? $el.find(selectors.discountSelector).text() : '';
 
-            // Parsing logic (Rough implementation - needs refinement for each specific site)
+            // Extract optional fees if selectors exist (Phase 2)
+            // For now, we default to 0, but this is where we'd add `activationFeeSelector`
+            let activationFee = 0;
+            let monthlyDataFee = 0;
+
+            // Parsing logic
             const accountSize = this.parseNumber(accountSizeText);
             const currentPrice = this.parseNumber(priceText);
             const discountPercent = this.parseNumber(discountText) || 0;
 
             if (accountSize > 0 && currentPrice > 0) {
-                results.push({
+                const pricing: Pricing = {
                     propFirmId: catalogEntry.propFirmId,
                     propFirmName: catalogEntry.propFirmName,
                     accountSize: accountSize,
-                    accountSizeCurrency: 'USD', // Default assumption
+                    accountSizeCurrency: 'USD',
                     currentPrice: currentPrice,
                     priceCurrency: 'USD',
                     discountPercent: discountPercent,
+
+                    // Fees
+                    activationFee: activationFee,
+                    monthlyDataFee: monthlyDataFee,
+                    evaluationFee: 0,
+
                     sourceUrl: catalogEntry.pricingPageUrl,
                     sourceTimestamp: new Date(),
                     lastSeenAt: new Date(),
-                    hasChanged: false, // Calculated later
+                    hasChanged: false,
                     requiresManualReview: false,
                     isVerified: false
-                });
+                };
+
+                // Calculate True Cost
+                pricing.trueCost = this.trueCostService.calculateTrueCost(pricing);
+
+                results.push(pricing);
             }
         });
 

@@ -22,8 +22,9 @@ export class PricingRepository implements IPricingStore {
         INSERT INTO pricing_snapshots (
           prop_firm_id, account_size, account_size_currency,
           current_price, price_currency, discount_percent, discount_label,
-          is_new_deal, requires_manual_review, source_url
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+          is_new_deal, requires_manual_review, source_url,
+          activation_fee, evaluation_fee, monthly_data_fee, true_cost
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
         RETURNING *;
       `;
 
@@ -37,7 +38,11 @@ export class PricingRepository implements IPricingStore {
                 pricing.discountLabel,
                 pricing.hasChanged, // is_new_deal logic can be refined
                 pricing.requiresManualReview,
-                pricing.sourceUrl
+                pricing.sourceUrl,
+                pricing.activationFee || 0,
+                pricing.evaluationFee || 0,
+                pricing.monthlyDataFee || 0,
+                pricing.trueCost || pricing.currentPrice // Default to current price if no true cost
             ];
 
             const res = await client.query(query, values);
@@ -122,6 +127,37 @@ export class PricingRepository implements IPricingStore {
         }
     }
 
+    /**
+     * Get pricing for specific firms (Comparison Feature)
+     */
+    async getPricingForFirms(firmIds: string[], accountSize?: number): Promise<Pricing[]> {
+        const client = await this.pool.connect();
+        try {
+            let query = `
+                SELECT DISTINCT ON (ps.prop_firm_id, ps.account_size) 
+                  ps.*,
+                  sc.prop_firm_name
+                FROM pricing_snapshots ps
+                JOIN source_catalog sc ON ps.prop_firm_id = sc.prop_firm_id
+                WHERE ps.prop_firm_id = ANY($1)
+            `;
+
+            const values: any[] = [firmIds];
+
+            if (accountSize) {
+                query += ` AND ps.account_size = $2`;
+                values.push(accountSize);
+            }
+
+            query += ` ORDER BY ps.prop_firm_id, ps.account_size, ps.snapshot_created_at DESC`;
+
+            const res = await client.query(query, values);
+            return res.rows.map(this.mapRowToPricing);
+        } finally {
+            client.release();
+        }
+    }
+
     async getPricingHistory(propFirmId: string, accountSize: number, days: number): Promise<PricingSnapshot[]> {
         throw new Error('Method not implemented.');
     }
@@ -138,6 +174,10 @@ export class PricingRepository implements IPricingStore {
             discountPercent: parseFloat(row.discount_percent),
             discountLabel: row.discount_label,
             sourceUrl: row.source_url,
+            activationFee: parseFloat(row.activation_fee || 0),
+            evaluationFee: parseFloat(row.evaluation_fee || 0),
+            monthlyDataFee: parseFloat(row.monthly_data_fee || 0),
+            trueCost: parseFloat(row.true_cost || row.current_price),
             sourceTimestamp: row.snapshot_created_at,
             lastSeenAt: row.snapshot_created_at,
             hasChanged: row.is_new_deal,

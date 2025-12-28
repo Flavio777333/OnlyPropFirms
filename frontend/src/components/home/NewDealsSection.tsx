@@ -16,7 +16,7 @@ export const NewDealsSection: React.FC = () => {
         const loadNewDeals = async () => {
             try {
                 setLoading(true);
-                const newDeals = await pricingService.fetchNewDeals();
+                const newDeals = await pricingService.getNewDeals();
                 setDeals(newDeals.slice(0, 5)); // Top 5
                 setError(null);
             } catch (err) {

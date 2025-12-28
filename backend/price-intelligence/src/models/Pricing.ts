@@ -24,6 +24,8 @@ export interface Pricing {
     activationFee?: number;
     resetFee?: number;
     monthlyDataFee?: number;
+    trueCost?: number; // Calculated Total Cost
+
 
     // Meta
     sourceUrl: string; // Where this price came from
